@@ -1,6 +1,6 @@
 export class GestureRecognition {
   constructor() {
-    this.pinchThreshold = 0.035;
+    this.pinchThreshold = 0.045; // Increased from 0.035 to make pinching easier
     
     // Debouncing/Trigger state tracking
     this.lastTriggeredTime = {
@@ -29,8 +29,8 @@ export class GestureRecognition {
     const wristToPip = this.getDistance(wrist, pip);
     const wristToTip = this.getDistance(wrist, tip);
     
-    // Multiplier of 1.05 adds a small buffer to avoid jitter
-    return wristToTip > (wristToPip * 1.05);
+    // Multiplier of 1.02 makes it easier to extend fingers (especially ring and pinky)
+    return wristToTip > (wristToPip * 1.02);
   }
 
   // Heuristic for thumb extension
@@ -43,7 +43,7 @@ export class GestureRecognition {
     const ipToMcp = this.getDistance(thumbIP, indexMCP);
     const tipToMcp = this.getDistance(thumbTip, indexMCP);
     
-    return tipToMcp > (ipToMcp * 1.05);
+    return tipToMcp > (ipToMcp * 1.02);
   }
 
   // Classifies the gesture of a single hand
@@ -66,9 +66,9 @@ export class GestureRecognition {
       // Check if wrist rotation is happening
       // Vector from wrist (0) to index MCP (5)
       const wrist = landmarks[0];
-      const indexMCP = landmarks[5];
-      const dx = indexMCP.x - wrist.x;
-      const dy = indexMCP.y - wrist.y;
+      const middleMCP = landmarks[9]; // Middle MCP is center of hand, more stable for wrist rotation
+      const dx = middleMCP.x - wrist.x;
+      const dy = middleMCP.y - wrist.y;
       
       // Calculate hand roll angle (rotation around Z axis, in radians)
       const angle = Math.atan2(dy, dx);

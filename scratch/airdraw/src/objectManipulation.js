@@ -6,7 +6,7 @@ export class ObjectManipulation {
   constructor() {
     this.selectedStroke = null;
     this.selectionBoxHelper = null;
-    this.selectionThreshold = 6.0; // Distance in 3D units
+    this.selectionThreshold = 10.0; // Increased from 6.0 to make selecting easier
 
     // Transformation start parameters
     this.initialStrokePoints = [];
@@ -115,7 +115,8 @@ export class ObjectManipulation {
     } else {
       // Single-hand pinch: Move and Rotate
       translation.subVectors(currentPinchPoint, this.initialPinchPoint);
-      rotationAngle = currentWristAngle - this.initialWristAngle;
+      // Multiply by 1.8 sensitivity factor so the user doesn't have to strain their wrist
+      rotationAngle = (currentWristAngle - this.initialWristAngle) * 1.8;
     }
 
     // 2. Apply translations/rotations to stroke coordinates

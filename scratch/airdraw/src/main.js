@@ -253,8 +253,6 @@ class App {
       } else if (mode === 'ERASE') {
         uiManager.logConsole("Eraser mode active.");
       }
-      
-      this.prevMode = mode;
     }
 
     // Update scene light tracker
@@ -331,6 +329,9 @@ class App {
         }
         break;
     }
+    
+    // Save current mode as previous for the next frame's transitions checks
+    this.prevMode = mode;
   }
 
   // Cycles the active brush color
