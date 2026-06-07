@@ -1,3 +1,4 @@
+import './style.css';
 import * as THREE from 'three';
 import { sceneManager } from './sceneManager';
 import { handTracking } from './handTracking';
