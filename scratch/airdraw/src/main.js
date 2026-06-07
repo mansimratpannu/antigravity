@@ -178,8 +178,13 @@ class App {
     }
 
     // 4. Apply exponential smoothing to prevent coordinate noise/jitter
-    if (target3DPos) {
-      this.smoothedCoords.lerp(target3DPos, 1.0 - this.coordsSmoothing);
+    if (target3DPos && !isNaN(target3DPos.x) && !isNaN(target3DPos.y) && !isNaN(target3DPos.z)) {
+      // Recover smoothedCoords if contaminated by NaN during initialization
+      if (isNaN(this.smoothedCoords.x) || isNaN(this.smoothedCoords.y) || isNaN(this.smoothedCoords.z)) {
+        this.smoothedCoords.copy(target3DPos);
+      } else {
+        this.smoothedCoords.lerp(target3DPos, 1.0 - this.coordsSmoothing);
+      }
     }
 
     // 5. Execute state machine logic based on gesture mode
@@ -212,7 +217,7 @@ class App {
     
     // Look up actual webcam aspect ratio dynamically (defaults to widescreen 16/9)
     const video = document.getElementById('webcam');
-    const videoAspect = (video && video.videoWidth) ? (video.videoWidth / video.videoHeight) : (16 / 9);
+    const videoAspect = (video && video.videoWidth && video.videoHeight) ? (video.videoWidth / video.videoHeight) : (16 / 9);
 
     // X axis mapping to align perfectly with mirrored fullscreen video
     const x = (0.5 - normalizedPoint.x) * viewPlaneHeight * videoAspect;

@@ -1,124 +1,45 @@
-# Implementation Plan - AirDraw (Futuristic 3D Air-Drawing App)
+# Implementation Plan - Gesture Detection & Drawing Fixes
 
-AirDraw is a futuristic, sci-fi-inspired web application that enables users to draw 3D holographic artwork in mid-air using hand gestures captured from a webcam. The project integrates **Three.js** for 3D rendering and **MediaPipe Hands** for real-time, high-frequency hand tracking.
+This plan aims to resolve the drawing detection issues ("cant draw", "index point not working", and "new layer peace sign not working") by switching the finger extension heuristic from a wrist-relative distance calculation to a knuckle-relative (MCP joint) 3D Euclidean distance calculation.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **MediaPipe Loading Method**: We will load MediaPipe Hands via Google's official CDN. This guarantees 100% reliability, avoids local WASM bundling configuration issues, and ensures the fastest initial load.
-> **Active Workspace**: We will create the project inside `C:\Users\mansi\.gemini\antigravity\scratch\airdraw`. You will need to set this subdirectory as your active workspace in your editor.
-
-## Open Questions
-- *None at this stage. The requirements are detailed and clear.*
+> **Knuckle-Relative Extension Heuristic**:
+> Instead of using the wrist (landmark 0) as the reference point for finger extension, we will use each finger's corresponding knuckle (MCP joint, landmark `pipIdx - 1`). 
+> - **Extended Ratio (straight finger)**: The tip-to-knuckle distance is about `2.0x` to `2.5x` of the PIP-to-knuckle distance.
+> - **Curled Ratio (folded finger)**: The tip curls back to the knuckle, dropping the ratio below `1.0x`.
+> - This offers a massive, stable separation (2.0 vs < 1.0) compared to the old wrist-based ratio (1.23 vs 0.85), making it highly resilient to depth noise.
 
 ---
 
 ## Proposed Changes
 
-We will initialize a Vanilla JS project using Vite and organize the codebase into modular JS files under `src/`.
+### 1. Gesture Recognition Heuristics
 
-### 1. Core Structure & Configuration
+#### [MODIFY] [gestureRecognition.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/gestureRecognition.js)
+- Update `isFingerExtended(landmarks, tipIdx, pipIdx)` to:
+  - Derive `mcpIdx = pipIdx - 1`.
+  - Calculate `mcpToPip` and `mcpToTip` using 3D Euclidean distance.
+  - Return `true` if `mcpToTip > mcpToPip * 1.35`.
+- Remove the unused `wristIdx` parameter from `isFingerExtended`.
 
-#### [NEW] [package.json](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/package.json)
-- Standard Node project setup.
-- Dependencies: `three` (latest), `vite` (devDependency).
+### 2. Coordinate Sanitization & Safety Guards
 
-#### [NEW] [index.html](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/index.html)
-- Main entry page with webcam video input (hidden or PIP view).
-- HTML container for the Three.js canvas.
-- Heads-up Display (HUD) overlay for stats, confidence indicators, and sci-fi glassmorphism controls.
-- Import MediaPipe libraries from CDN.
+#### [MODIFY] [drawingEngine.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/drawingEngine.js)
+- Add safety guards in `addPointToStroke(point)` to filter out any coordinates containing `NaN` values before performing operations or appending to `activeStrokePoints`.
 
-#### [NEW] [style.css](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/style.css)
-- Sci-fi CSS theme using custom fonts (e.g., Orbitron / Share Tech Mono).
-- Glassmorphism panels (using `backdrop-filter: blur()`).
-- Neon glow styles (`box-shadow`, `text-shadow`) using cyber cyan and purple.
-- Custom cursor styling.
-
----
-
-### 2. JavaScript Modules (`src/`)
-
-#### [NEW] [sceneManager.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/sceneManager.js)
-- Initializes Three.js renderer, perspective camera, lights (ambient, directional, neon point lights).
-- Optional bloom post-processing (UnrealBloomPass) for futuristic glow.
-- Renders a grid helper and a futuristic 3D boundary cage.
-- Handles window resizing.
-- Implements particle engine for cursor trail and particle brush.
-
-#### [NEW] [handTracking.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/handTracking.js)
-- Configures camera feed at 60fps.
-- Sets up MediaPipe `Hands` API with confidence thresholds (e.g., minDetectionConfidence: 0.7, minTrackingConfidence: 0.7).
-- Sends raw coordinate data to gesture recognizer.
-- Provides status updates (tracking lost, tracking active, hand confidence levels).
-
-#### [NEW] [gestureRecognition.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/gestureRecognition.js)
-- Normalizes coordinates relative to the hand size (distance from wrist) to ensure orientation/distance independence.
-- Implements heuristics to detect:
-  1. **Draw Mode**: Index finger extended only.
-  2. **Stop Drawing**: All fingers extended (open palm).
-  3. **Eraser Mode**: Closed fist.
-  4. **Pinch Mode**: Index and thumb tips touching (distance < threshold).
-  5. **Two-Hand Pinch**: Both hands in pinch mode (calculates relative distance change for scaling).
-  6. **Wrist Rotation**: Measures roll angle based on the vector from wrist to index knuckle.
-  7. **Cycle Brush Colors**: Index, middle, and ring fingers extended.
-  8. **Create New Layer**: Peace sign (index and middle fingers extended).
-- Includes debouncing logic for triggers (e.g., color cycle, creating new layer) to prevent rapid firing.
-
-#### [NEW] [drawingEngine.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/drawingEngine.js)
-- Manages drawing layers and strokes.
-- Stores every stroke as an array of 3D coordinates.
-- Generates 3D meshes for strokes using `CatmullRomCurve3` combined with:
-  - Standard tube geometry (for thick 3D lines).
-  - Emissive glowing materials (Glow Brush mode).
-  - Particle trails (Particle Brush mode).
-- Implements:
-  - **Undo / Redo stacks**.
-  - **Eraser collision checking**: Calculates distance between the fist (eraser cursor) and stroke geometries to delete close strokes.
-  - **Brush properties**: Colors, sizes, types (Solid, Glow, Particle).
-
-#### [NEW] [objectManipulation.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/objectManipulation.js)
-- Implements object selection using a raycast/distance check from the index tip to the drawing strokes.
-- Translates (moves) the selected drawing stroke relative to the pinch point movement.
-- Scales the selected drawing based on the relative change in distance between two pinch points (when two-hand pinch is active).
-- Rotates the selected drawing based on wrist roll angle or delta angle from start of rotation.
-
-#### [NEW] [exportManager.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/exportManager.js)
-- Implements exporting the 3D drawing strokes as a **GLTF** file using Three.js `GLTFExporter`.
-- Saves drawing strokes data structure (layers, colors, brush sizes, 3D point lists) as **JSON** files.
-- Handles importing saved JSON drawings and reconstructing their 3D meshes in the scene.
-
-#### [NEW] [ui.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/ui.js)
-- Updates the HTML HUD with current gesture status, active mode, layer counts, active color, and brush size.
-- Displays tracking indicators (hand confidence percentage, FPS, tracking status).
-- Manages virtual cursor projection: maps 2D/3D hand coordinates to screen-space for UI interactions.
-- Dwell click implementation: hovering over HTML UI buttons (like Clear, Undo, Export) triggers action.
-- Screenshot, Fullscreen, and Import/Export file dialogue bindings.
-
-#### [NEW] [main.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/main.js)
-- Application orchestrator.
-- Connects `handTracking` callbacks to `gestureRecognition`, which then routes to `drawingEngine`, `objectManipulation`, and `ui`.
-- Maintains the main animation loop (`requestAnimationFrame`) to update Three.js rendering, particles, and smooth transitions.
+#### [MODIFY] [main.js](file:///C:/Users/mansi/.gemini/antigravity/scratch/airdraw/src/main.js)
+- Add debug logging to `executeGestureState` to write active modes to the HUD System Console when they change, making it easy to see if `DRAW` mode is successfully activated.
 
 ---
 
 ## Verification Plan
 
-### Automated Tests
-- Since this is a highly visual, gesture-controlled WebGL application, we will rely on manual runtime verification and standard console logging/performance monitoring.
-- We will include an optional "mouse/keyboard simulator" mode to test drawing and manipulation functionalities without a webcam.
-
 ### Manual Verification
-1. **Camera & Tracking initialization**: Verify webcam requests permissions, initializes at 60 FPS, and successfully feeds frames to MediaPipe Hands.
-2. **Gesture Calibration**: Print gesture classifications to HUD/console. Verify high-accuracy recognition of:
-   - Index-extended -> Draw mode.
-   - Open Palm -> Hover/Stop mode.
-   - Fist -> Eraser mode (removing nearby strokes).
-   - Pinch -> Move/Rotate/Scale mode.
-   - Peace sign -> New layer creation.
-   - Three fingers -> Color rotation.
-3. **Drawing System**: Verify drawing works in true 3D (rotate scene to check curves). Test Undo/Redo and Clear.
-4. **Transformations**: Select an existing stroke by pinching it, then move it, scale it (using two hands), and rotate it.
-5. **Glow & Particles**: Toggle brush styles. Confirm visual fidelity of Glow brush and Particle brush modes.
-6. **File Operations**: Save/Load JSON files. Export to GLTF and inspect the exported file using standard GLTF viewers.
-7. **Performance Check**: Verify frame rates stay near 60fps on desktop and mobile. Check for memory leaks on repeated stroke creation.
+1. **Dwell/Pinch UI interactions**: Check that the virtual cursor continues to hover and click buttons seamlessly.
+2. **Draw Mode**: Hold index finger up and curl other fingers. Confirm the system console logs "Started drawing..." and strokes are successfully drawn.
+3. **Peace Sign**: Extend index and middle fingers. Verify that a "New active drawing layer" is created and logged to the console.
+4. **Eraser Mode**: Form a closed fist. Verify that nearby strokes are erased with red particle debris.
+5. **Color Cycle**: Hold up index, middle, and ring fingers. Verify the brush color changes.
+6. **No-Webcam Fallback**: Double-click the canvas to enable mouse simulation. Verify that drawing and controls work properly.

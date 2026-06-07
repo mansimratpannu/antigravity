@@ -1,6 +1,6 @@
 {
   "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary":  "Implementation plan for building the AirDraw futuristic web application using Vite, Three.js, and MediaPipe Hands. Details project structure, gesture recognition logic, drawing engine implementation, object manipulation, export capabilities, and futuristic visual design.",
-  "updatedAt":  "2026-06-07T06:23:41.267383700Z",
+  "summary":  "Implementation plan updating gesture recognition heuristics to use knuckle-relative 3D Euclidean distances instead of wrist-relative distances, fixing drawing and layer creation issues. Also includes NaN coordinate guards in drawingEngine.js.",
+  "updatedAt":  "2026-06-07T08:21:34.803196700Z",
   "requestFeedback":  true
 }
