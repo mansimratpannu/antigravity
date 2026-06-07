@@ -19,18 +19,26 @@ export class GestureRecognition {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
+  // Calculate Euclidean distance in 2D (ignoring Z depth noise)
+  getDistance2D(p1, p2) {
+    if (!p1 || !p2) return 999;
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
   // Heuristic: Is a finger extended?
-  // Checks if the distance from the wrist to the finger tip is greater than the distance from the wrist to the PIP joint.
-  isFingerExtended(landmarks, tipIdx, pipIdx, wristIdx = 0) {
-    const wrist = landmarks[wristIdx];
-    const pip = landmarks[pipIdx];
+  // Checks if the 2D distance from the knuckle (MCP) to the tip is greater than knuckle to PIP.
+  // Curled fingers bend backward making tip-to-MCP distance very small.
+  isFingerExtended(landmarks, tipIdx, pipIdx, mcpIdx) {
     const tip = landmarks[tipIdx];
+    const pip = landmarks[pipIdx];
+    const mcp = landmarks[mcpIdx];
     
-    const wristToPip = this.getDistance(wrist, pip);
-    const wristToTip = this.getDistance(wrist, tip);
+    const mcpToPip = this.getDistance2D(mcp, pip);
+    const mcpToTip = this.getDistance2D(mcp, tip);
     
-    // Multiplier of 1.02 makes it easier to extend fingers (especially ring and pinky)
-    return wristToTip > (wristToPip * 1.02);
+    return mcpToTip > (mcpToPip * 1.1);
   }
 
   // Heuristic for thumb extension
@@ -40,8 +48,8 @@ export class GestureRecognition {
     const thumbIP = landmarks[3];
     const indexMCP = landmarks[5];
     
-    const ipToMcp = this.getDistance(thumbIP, indexMCP);
-    const tipToMcp = this.getDistance(thumbTip, indexMCP);
+    const ipToMcp = this.getDistance2D(thumbIP, indexMCP);
+    const tipToMcp = this.getDistance2D(thumbTip, indexMCP);
     
     return tipToMcp > (ipToMcp * 1.02);
   }
@@ -53,10 +61,10 @@ export class GestureRecognition {
     }
 
     const isThumbExt = this.isThumbExtended(landmarks);
-    const isIndexExt = this.isFingerExtended(landmarks, 8, 6);
-    const isMiddleExt = this.isFingerExtended(landmarks, 12, 10);
-    const isRingExt = this.isFingerExtended(landmarks, 16, 14);
-    const isPinkyExt = this.isFingerExtended(landmarks, 20, 18);
+    const isIndexExt = this.isFingerExtended(landmarks, 8, 6, 5);
+    const isMiddleExt = this.isFingerExtended(landmarks, 12, 10, 9);
+    const isRingExt = this.isFingerExtended(landmarks, 16, 14, 13);
+    const isPinkyExt = this.isFingerExtended(landmarks, 20, 18, 17);
 
     const pinchDist = this.getDistance(landmarks[4], landmarks[8]);
     const isPinching = pinchDist < this.pinchThreshold;

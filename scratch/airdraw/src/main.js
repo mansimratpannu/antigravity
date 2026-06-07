@@ -208,9 +208,11 @@ class App {
   // Maps normalized MediaPipe coordinates into Three.js cage volume
   mapCoordinates(normalizedPoint, handScaleSize) {
     // 60-degree FOV camera at z=45 gives a view plane height of ~52 units.
-    // Video aspect ratio is 4:3 (640/480 = 1.33)
     const viewPlaneHeight = 52;
-    const videoAspect = 640 / 480;
+    
+    // Look up actual webcam aspect ratio dynamically (defaults to widescreen 16/9)
+    const video = document.getElementById('webcam');
+    const videoAspect = (video && video.videoWidth) ? (video.videoWidth / video.videoHeight) : (16 / 9);
 
     // X axis mapping to align perfectly with mirrored fullscreen video
     const x = (0.5 - normalizedPoint.x) * viewPlaneHeight * videoAspect;

@@ -103,8 +103,8 @@ export class HandTracking {
         const currentFps = 1000 / delta;
         this.fps += (currentFps - this.fps) / this.fpsFilter;
       },
-      width: 640,
-      height: 480
+      width: 1280,
+      height: 720
     });
 
     await this.cameraHelper.start();
