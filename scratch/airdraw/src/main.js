@@ -10,7 +10,7 @@ import { uiManager } from './ui';
 class App {
   constructor() {
     this.smoothedCoords = new THREE.Vector3();
-    this.coordsSmoothing = 0.75; // Low pass filter factor (0 = no smoothing, 1 = locked)
+    this.coordsSmoothing = 0.88; // Low pass filter factor (higher = smoother, 0 = raw)
     
     // Track gesture changes
     this.prevMode = 'LOST';
@@ -207,15 +207,20 @@ class App {
 
   // Maps normalized MediaPipe coordinates into Three.js cage volume
   mapCoordinates(normalizedPoint, handScaleSize) {
-    // X axis mirroring: maps 0..1 raw coord to Three.js range [-22, 22]
-    const x = (0.5 - normalizedPoint.x) * 44;
-    // Y axis: maps 0..1 raw coord to Three.js range [-16, 16]
-    const y = (0.5 - normalizedPoint.y) * 32;
+    // 60-degree FOV camera at z=45 gives a view plane height of ~52 units.
+    // Video aspect ratio is 4:3 (640/480 = 1.33)
+    const viewPlaneHeight = 52;
+    const videoAspect = 640 / 480;
+
+    // X axis mapping to align perfectly with mirrored fullscreen video
+    const x = (0.5 - normalizedPoint.x) * viewPlaneHeight * videoAspect;
+    // Y axis mapping
+    const y = (0.5 - normalizedPoint.y) * viewPlaneHeight;
     
     // Z axis: Map hand size (distance from camera) to Three.js range [-18, 18]
-    // Standard hand size values range from 0.07 (far) to 0.22 (close)
-    const minHand = 0.07;
-    const maxHand = 0.20;
+    // Standard hand size values range from 0.06 (far) to 0.19 (close)
+    const minHand = 0.06;
+    const maxHand = 0.19;
     const clampedHand = Math.max(minHand, Math.min(maxHand, handScaleSize));
     const normalizedHand = (clampedHand - minHand) / (maxHand - minHand);
     

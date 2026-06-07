@@ -43,10 +43,10 @@ export class UIManager {
     const fpsVal = document.querySelector('#fps-counter .status-text');
     if (fpsVal) fpsVal.innerText = fps;
 
-    const handsVal = document.getElementById('pip-hands-count');
+    const handsVal = document.getElementById('hands-count');
     if (handsVal) handsVal.innerText = handCount;
 
-    const confVal = document.getElementById('pip-confidence');
+    const confVal = document.getElementById('conf-val');
     if (confVal) confVal.innerText = `${Math.round(trackingConfidence * 100)}%`;
   }
 

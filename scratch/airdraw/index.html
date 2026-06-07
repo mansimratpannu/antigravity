@@ -16,6 +16,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   </head>
   <body>
+    <!-- Fullscreen Webcam & Tracking Overlay -->
+    <video id="webcam" autoplay playsinline muted></video>
+    <canvas id="tracking-canvas"></canvas>
+
     <!-- 3D Scene Container -->
     <div id="canvas-container"></div>
     
@@ -35,6 +39,12 @@
           <div class="indicator" id="track-status">
             <span class="status-dot red"></span>
             TRACKING: <span class="status-text">DISCONNECTED</span>
+          </div>
+          <div class="indicator" id="hands-indicator">
+            HANDS: <span class="status-text" id="hands-count">0</span>
+          </div>
+          <div class="indicator" id="conf-indicator">
+            CONFIDENCE: <span class="status-text" id="conf-val">0%</span>
           </div>
           <div class="indicator" id="fps-counter">
             SYS_FPS: <span class="status-text">0</span>
@@ -185,17 +195,6 @@
         </div>
       </footer>
 
-      <!-- Floating PIP Webcam view in the corner -->
-      <div id="pip-container" class="hud-panel glass">
-        <div class="pip-header">WEBCAM_STREAM <span class="pip-dot green"></span></div>
-        <div class="video-wrapper">
-          <video id="webcam" autoplay playsinline muted></video>
-          <canvas id="tracking-canvas"></canvas>
-        </div>
-        <div class="pip-stats">
-          HANDS: <span id="pip-hands-count">0</span> | CONFIDENCE: <span id="pip-confidence">0%</span>
-        </div>
-      </div>
     </div>
 
     <!-- Screen overlay for holographic scanlines & CRT noise -->

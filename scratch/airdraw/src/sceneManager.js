@@ -31,7 +31,6 @@ export class SceneManager {
 
     // 1. Create Scene
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x020208, 0.015);
 
     // 2. Create Camera
     const aspect = window.innerWidth / window.innerHeight;
@@ -41,10 +40,10 @@ export class SceneManager {
     this.camera.lookAt(0, 0, 0);
 
     // 3. Create Renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x020208, 1);
+    this.renderer.setClearColor(0x000000, 0); // Transparent background!
     this.renderer.shadowMap.enabled = true;
     
     this.container.appendChild(this.renderer.domElement);

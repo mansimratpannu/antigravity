@@ -70,8 +70,8 @@ export class HandTracking {
 
   resizeCanvas() {
     if (this.overlayCanvas) {
-      this.overlayCanvas.width = this.overlayCanvas.parentElement.clientWidth || 320;
-      this.overlayCanvas.height = this.overlayCanvas.parentElement.clientHeight || 240;
+      this.overlayCanvas.width = this.videoElement?.videoWidth || 640;
+      this.overlayCanvas.height = this.videoElement?.videoHeight || 480;
     }
   }
 
@@ -85,6 +85,10 @@ export class HandTracking {
     if (!window.Camera) {
       throw new Error("MediaPipe Camera utility not loaded from CDN.");
     }
+    
+    this.videoElement.addEventListener('loadedmetadata', () => {
+      this.resizeCanvas();
+    });
     
     // Initialize Camera helper
     this.cameraHelper = new window.Camera(this.videoElement, {
