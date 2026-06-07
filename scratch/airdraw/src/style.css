@@ -449,7 +449,7 @@ body, html {
 body.mode-hologram #camera-viewport {
   position: absolute;
   bottom: 120px;
-  left: 15px;
+  left: 310px;
   width: 220px;
   aspect-ratio: 4/3;
   pointer-events: auto;
