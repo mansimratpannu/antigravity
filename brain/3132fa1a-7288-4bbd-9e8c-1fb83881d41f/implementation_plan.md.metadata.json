@@ -1,0 +1,6 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "This implementation plan covers the complete delivery of Phase 6 goals for the AirDraw application. It details the step-by-step onboarding wizard design, the gallery, share, and fullscreen integration, the theme selector wire-up, the performance optimization check, and the config cleanups including extracting magic numbers.",
+  "updatedAt":  "2026-06-07T08:47:36.119797300Z",
+  "requestFeedback":  true
+}
