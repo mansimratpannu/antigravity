@@ -1,0 +1,18 @@
+
+> airdraw@0.0.0 dev
+> vite
+
+
+  VITE v8.0.16  ready in 212 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+12:04:51 pm [vite] (client) [console.warn] I0000 00:00:1780814091.012000       1 gl_context_webgl.cc:151] Successfully created a WebGL context with major version 3 and handle 3
+12:04:51 pm [vite] (client) [console.warn] I0000 00:00:1780814091.016000       1 gl_context.cc:359] GL version: 3.0 (OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)))
+12:04:51 pm [vite] (client) [console.warn] W0000 00:00:1780814091.019000       1 gl_context.cc:1000] OpenGL error checking is disabled
+12:05:19 pm [vite] (client) [console.warn] I0000 00:00:1780814119.223000       1 gl_context_webgl.cc:151] Successfully created a WebGL context with major version 3 and handle 3
+12:05:19 pm [vite] (client) [console.warn] I0000 00:00:1780814119.230000       1 gl_context.cc:359] GL version: 3.0 (OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)))
+12:05:19 pm [vite] (client) [console.warn] W0000 00:00:1780814119.231000       1 gl_context.cc:1000] OpenGL error checking is disabled
+12:05:25 pm [vite] (client) [console.warn] I0000 00:00:1780814125.763000       1 gl_context_webgl.cc:151] Successfully created a WebGL context with major version 3 and handle 3
+12:05:25 pm [vite] (client) [console.warn] I0000 00:00:1780814125.766000       1 gl_context.cc:359] GL version: 3.0 (OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)))
+12:05:25 pm [vite] (client) [console.warn] W0000 00:00:1780814125.767000       1 gl_context.cc:1000] OpenGL error checking is disabled
