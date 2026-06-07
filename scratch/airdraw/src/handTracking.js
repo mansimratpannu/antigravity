@@ -50,8 +50,8 @@ export class HandTracking {
       this.hands.setOptions({
         maxNumHands: 2,
         modelComplexity: 1,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7
+        minDetectionConfidence: 0.5, // Lowered from 0.7 for more responsive, forgiving hand detection
+        minTrackingConfidence: 0.5  // Lowered from 0.7 to maintain tracking lock easily
       });
 
       this.hands.onResults((results) => this.handleResults(results));
