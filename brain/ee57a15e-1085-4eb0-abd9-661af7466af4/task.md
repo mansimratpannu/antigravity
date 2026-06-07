@@ -1,0 +1,25 @@
+# Tasks: AirDraw Implementation
+
+- [ ] Initialize project and setup configuration
+    - [x] Create `C:\Users\mansi\.gemini\antigravity\scratch\airdraw` directory
+    - [x] Initialize Vite project with Vanilla template
+    - [x] Clean up default template files
+    - [x] Install Three.js dependency (`npm i three`)
+- [x] Create base HTML & CSS layout
+    - [x] Setup `index.html` with CDNs for MediaPipe and responsive sci-fi HUD structure
+    - [x] Setup `style.css` with dark holographic glassmorphism design and neon glows
+- [x] Implement core JS modules
+    - [x] Create `src/sceneManager.js` (Three.js setup, grid helper, lights, cursor particles)
+    - [x] Create `src/handTracking.js` (Webcam access, MediaPipe hands initialization, status flags)
+    - [x] Create `src/gestureRecognition.js` (Finger status heuristics, gesture classifiers, debouncing)
+    - [x] Create `src/drawingEngine.js` (3D point storage, CatmullRom curves, tubes, glow/particle brush, undo/redo, eraser collision)
+    - [x] Create `src/objectManipulation.js` (Stroke selection, pinch & drag, two-hand pinch scale, wrist rotate)
+    - [x] Create `src/exportManager.js` (GLTF export, JSON save/load)
+    - [x] Create `src/ui.js` (HUD stats, hand tracking feedback, virtual cursor projection, dwell clicking)
+    - [x] Create `src/main.js` (App initialization, loop coordination, bridge between hands, drawing, and UI)
+- [x] Verification and Polish
+    - [x] Confirm webcam permissions and 60fps tracking
+    - [x] Validate drawing, layers, and undo/redo
+    - [x] Validate selection, move, scale, and rotate gestures
+    - [x] Test JSON save/load and GLTF export
+    - [x] Create final `walkthrough.md` documentation

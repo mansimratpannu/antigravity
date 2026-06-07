@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_TASK",
+  "summary":  "Task list for tracking progress during execution of the AirDraw project. Tracks project initialization, index setup, style definitions, and the individual modules (sceneManager, handTracking, gestureRecognition, drawingEngine, objectManipulation, exportManager, ui, and main).",
+  "updatedAt":  "2026-06-07T06:25:10.453480700Z"
+}

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AirDraw // Holographic 3D Sketchpad</title>
+    
+    <!-- Google Fonts for Sci-Fi Aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- MediaPipe Hands & Camera CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <!-- 3D Scene Container -->
+    <div id="canvas-container"></div>
+    
+    <!-- Holographic Sci-Fi HUD HUD Overlay -->
+    <div id="hud">
+      <!-- Top Status Bar -->
+      <header class="hud-panel top-bar">
+        <div class="logo">
+          <span class="glitch" data-text="AIRDRAW">AIRDRAW</span>
+          <span class="sys-version">// HOLOGRAPHIC.SYS.V1.0</span>
+        </div>
+        <div class="status-indicators">
+          <div class="indicator" id="cam-status">
+            <span class="status-dot red"></span>
+            CAM: <span class="status-text">OFFLINE</span>
+          </div>
+          <div class="indicator" id="track-status">
+            <span class="status-dot red"></span>
+            TRACKING: <span class="status-text">DISCONNECTED</span>
+          </div>
+          <div class="indicator" id="fps-counter">
+            SYS_FPS: <span class="status-text">0</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Left Panel: Gesture Cheat-sheet / Recognition HUD -->
+      <aside class="hud-panel left-panel glass">
+        <div class="panel-header">GESTURE CONTROL INTERFACE</div>
+        <div class="gesture-list">
+          <div class="gesture-item" id="gesture-draw">
+            <div class="gesture-icon">☝️</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Index Point</span>
+              <span class="gesture-action">Draw Mode</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-hover">
+            <div class="gesture-icon">🖐️</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Open Palm</span>
+              <span class="gesture-action">Hover / Stop Draw</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-erase">
+            <div class="gesture-icon">✊</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Closed Fist</span>
+              <span class="gesture-action">Eraser Mode</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-pinch">
+            <div class="gesture-icon">👌</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Pinch (Index+Thumb)</span>
+              <span class="gesture-action">Select & Drag 3D</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-rotate">
+            <div class="gesture-icon">🔄</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Pinch + Wrist Roll</span>
+              <span class="gesture-action">Rotate Stroke</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-scale">
+            <div class="gesture-icon">👐</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Two-Hand Pinch</span>
+              <span class="gesture-action">Scale Selected Stroke</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-color">
+            <div class="gesture-icon">🤟</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Three Fingers</span>
+              <span class="gesture-action">Cycle Colors</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+          <div class="gesture-item" id="gesture-layer">
+            <div class="gesture-icon">✌️</div>
+            <div class="gesture-info">
+              <span class="gesture-name">Peace Sign</span>
+              <span class="gesture-action">New Drawing Layer</span>
+            </div>
+            <div class="active-pulse"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Panel: Core Sketch Settings / Actions -->
+      <aside class="hud-panel right-panel glass">
+        <div class="panel-header">CONTROL PANEL</div>
+        
+        <!-- Brush Modes -->
+        <div class="settings-group">
+          <div class="group-title">BRUSH MODE</div>
+          <div class="btn-grid">
+            <button class="hud-btn active" id="btn-brush-solid">SOLID</button>
+            <button class="hud-btn" id="btn-brush-glow">GLOW</button>
+            <button class="hud-btn" id="btn-brush-particle">PARTICLE</button>
+          </div>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="settings-group">
+          <div class="group-title">BRUSH COLOR</div>
+          <div class="color-palette">
+            <div class="color-swatch active" style="--swatch-color: #00f0ff;" data-color="#00f0ff"></div>
+            <div class="color-swatch" style="--swatch-color: #bd00ff;" data-color="#bd00ff"></div>
+            <div class="color-swatch" style="--swatch-color: #ff0055;" data-color="#ff0055"></div>
+            <div class="color-swatch" style="--swatch-color: #00ff66;" data-color="#00ff66"></div>
+            <div class="color-swatch" style="--swatch-color: #ffcc00;" data-color="#ffcc00"></div>
+            <div class="color-swatch" style="--swatch-color: #ffffff;" data-color="#ffffff"></div>
+          </div>
+        </div>
+
+        <!-- Brush Size Slider -->
+        <div class="settings-group">
+          <div class="group-title">BRUSH SIZE: <span id="size-val">5</span>px</div>
+          <div class="slider-container">
+            <input type="range" id="brush-size" min="1" max="20" value="5" class="hud-slider" />
+          </div>
+        </div>
+
+        <!-- Drawing History / Layer Control -->
+        <div class="settings-group">
+          <div class="group-title">ACTIVE LAYER: <span id="layer-val">1</span></div>
+          <div class="btn-grid">
+            <button class="hud-btn" id="btn-new-layer">NEW LAYER</button>
+            <button class="hud-btn" id="btn-clear-layer">CLEAR LAYER</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="settings-group actions-group">
+          <div class="group-title">SYSTEM ACTIONS</div>
+          <div class="btn-grid">
+            <button class="hud-btn" id="btn-undo">UNDO</button>
+            <button class="hud-btn" id="btn-redo">REDO</button>
+            <button class="hud-btn" id="btn-clear-all">CLEAR ALL</button>
+            <button class="hud-btn" id="btn-screenshot">CAPTURE</button>
+            <button class="hud-btn" id="btn-fullscreen">FULLSCREEN</button>
+          </div>
+          
+          <div class="file-operations btn-grid" style="margin-top: 10px;">
+            <button class="hud-btn" id="btn-save-json">SAVE JSON</button>
+            <button class="hud-btn" id="btn-load-json">LOAD JSON</button>
+            <input type="file" id="file-input-json" accept=".json" style="display: none;" />
+            <button class="hud-btn" id="btn-export-gltf">EXPORT GLTF</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Bottom Panel: System Console -->
+      <footer class="hud-panel bottom-bar glass">
+        <div class="console-label">SYSTEM_LOG //</div>
+        <div class="console-content" id="console-logs">
+          [SYS] System initialized. Waiting for webcam access...
+        </div>
+      </footer>
+
+      <!-- Floating PIP Webcam view in the corner -->
+      <div id="pip-container" class="hud-panel glass">
+        <div class="pip-header">WEBCAM_STREAM <span class="pip-dot green"></span></div>
+        <div class="video-wrapper">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="tracking-canvas"></canvas>
+        </div>
+        <div class="pip-stats">
+          HANDS: <span id="pip-hands-count">0</span> | CONFIDENCE: <span id="pip-confidence">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen overlay for holographic scanlines & CRT noise -->
+    <div id="hologram-overlay"></div>
+    
+    <!-- Virtual Hover Cursor -->
+    <div id="virtual-cursor">
+      <div class="cursor-ring"></div>
+      <div class="cursor-dot"></div>
+      <div class="cursor-trail"></div>
+    </div>
+
+    <!-- main.js Module -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

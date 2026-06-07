@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Walkthrough of the completed AirDraw project. Documents modules structure, gesture heuristics, virtual cursor interaction, file saving/loading, and the built-in developer mouse simulation fallback.",
+  "updatedAt":  "2026-06-07T06:28:08.488674900Z"
+}
