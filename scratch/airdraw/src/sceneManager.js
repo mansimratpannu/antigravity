@@ -31,6 +31,7 @@ export class SceneManager {
 
     // 1. Create Scene
     this.scene = new THREE.Scene();
+    this.scene.fog = new THREE.FogExp2(0x020208, 0.015); // Enabled by default for Hologram view
 
     // 2. Create Camera
     const aspect = window.innerWidth / window.innerHeight;
@@ -43,7 +44,7 @@ export class SceneManager {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x000000, 0); // Transparent background!
+    this.renderer.setClearColor(0x020208, 1); // Solid dark by default
     this.renderer.shadowMap.enabled = true;
     
     this.container.appendChild(this.renderer.domElement);
@@ -314,6 +315,18 @@ export class SceneManager {
         obj.material.dispose();
       }
     });
+  }
+
+  setViewspaceMode(mode) {
+    if (!this.scene || !this.renderer) return;
+
+    if (mode === 'ar') {
+      this.renderer.setClearColor(0x000000, 0); // Transparent background
+      this.scene.fog = null; // Disable fog
+    } else {
+      this.renderer.setClearColor(0x020208, 1); // Solid dark
+      this.scene.fog = new THREE.FogExp2(0x020208, 0.015); // Re-enable fog
+    }
   }
 
   addObject(obj) {

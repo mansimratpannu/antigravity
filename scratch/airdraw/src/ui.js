@@ -2,6 +2,7 @@ import { sceneManager } from './sceneManager';
 import { drawingEngine } from './drawingEngine';
 import { exportManager } from './exportManager';
 import { objectManipulation } from './objectManipulation';
+import { handTracking } from './handTracking';
 
 export class UIManager {
   constructor() {
@@ -15,6 +16,30 @@ export class UIManager {
     
     // Prev state for UI updates
     this.lastActiveGestureId = null;
+  }
+
+  // Set the viewspace mode (Hologram vs AR View)
+  setViewspaceMode(mode) {
+    if (mode === 'ar') {
+      document.body.classList.remove('mode-hologram');
+      document.body.classList.add('mode-ar');
+      sceneManager.setViewspaceMode('ar');
+      document.getElementById('btn-view-ar')?.classList.add('active');
+      document.getElementById('btn-view-hologram')?.classList.remove('active');
+      this.logConsole("Viewspace: AR VIEW (draw in your own space)");
+    } else {
+      document.body.classList.remove('mode-ar');
+      document.body.classList.add('mode-hologram');
+      sceneManager.setViewspaceMode('hologram');
+      document.getElementById('btn-view-hologram')?.classList.add('active');
+      document.getElementById('btn-view-ar')?.classList.remove('active');
+      this.logConsole("Viewspace: HOLOGRAM CAGE (draw in 3D dark space)");
+    }
+    
+    // Resize the canvas overlay to fit the new mode dimensions
+    setTimeout(() => {
+      handTracking.resizeCanvas();
+    }, 50);
   }
 
   init() {
@@ -229,6 +254,15 @@ export class UIManager {
 
   // Bind all GUI button clicks to their drawing engine counterparts
   bindClickEvents() {
+    // Viewspace Mode Toggles
+    document.getElementById('btn-view-hologram')?.addEventListener('click', () => {
+      this.setViewspaceMode('hologram');
+    });
+
+    document.getElementById('btn-view-ar')?.addEventListener('click', () => {
+      this.setViewspaceMode('ar');
+    });
+
     // Color Swatches
     document.querySelectorAll('.color-swatch').forEach(swatch => {
       swatch.addEventListener('click', (e) => {

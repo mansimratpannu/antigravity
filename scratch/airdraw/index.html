@@ -15,10 +15,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   </head>
-  <body>
-    <!-- Fullscreen Webcam & Tracking Overlay -->
-    <video id="webcam" autoplay playsinline muted></video>
-    <canvas id="tracking-canvas"></canvas>
+  <body class="mode-hologram">
+    <!-- Viewport webcam feed (renders fullscreen in AR mode, and PIP in Hologram mode) -->
+    <div id="camera-viewport">
+      <div class="pip-header">WEBCAM_STREAM <span class="pip-dot green"></span></div>
+      <div class="video-wrapper">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="tracking-canvas"></canvas>
+      </div>
+    </div>
 
     <!-- 3D Scene Container -->
     <div id="canvas-container"></div>
@@ -126,6 +131,15 @@
       <!-- Right Panel: Core Sketch Settings / Actions -->
       <aside class="hud-panel right-panel glass">
         <div class="panel-header">CONTROL PANEL</div>
+        
+        <!-- Viewspace Mode -->
+        <div class="settings-group">
+          <div class="group-title">VIEWSPACE MODE</div>
+          <div class="btn-grid">
+            <button class="hud-btn active" id="btn-view-hologram">HOLOGRAM</button>
+            <button class="hud-btn" id="btn-view-ar">AR VIEW</button>
+          </div>
+        </div>
         
         <!-- Brush Modes -->
         <div class="settings-group">
